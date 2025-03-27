@@ -7,8 +7,11 @@ services:
       - "9000:9000"
     environment:
       - CLUSTER_NAME=test-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - HDFS_CONF_dfs_replication=1
     volumes:
       - namenode:/hadoop/dfs/name
+      - ./hadoop_data:/data
     networks:
       - hadoop-net
 
@@ -17,6 +20,7 @@ services:
     container_name: datanode
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - HDFS_CONF_dfs_replication=1
     volumes:
       - datanode:/hadoop/dfs/data
     depends_on:
@@ -72,6 +76,9 @@ services:
     container_name: spark-worker
     environment:
       - SPARK_MASTER=spark://spark-master:7077
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1g
     depends_on:
       - spark
     networks:
@@ -81,6 +88,7 @@ volumes:
   namenode:
   datanode:
   historyserver:
+  hadoop_data:
 
 networks:
   hadoop-net:
